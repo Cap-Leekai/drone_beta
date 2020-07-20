@@ -61,7 +61,7 @@ def filter(current_data, prev_data, current_speed, max_speed):
         print(offset_filter)
     if current_speed > max_speed:
         print("jump DOWN")
-        offset_filter = 0.0
+        offset_filter = 0.0     # prev_data - current_data
         print(offset_filter)
 
 
