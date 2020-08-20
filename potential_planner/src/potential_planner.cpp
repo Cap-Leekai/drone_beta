@@ -409,7 +409,7 @@ int main(int argc, char** argv)
   }
   else
   {
-    sub_lidar = n.subscribe("/scan", 10, lidarCb);
+    sub_lidar = n.subscribe("/laser/scan", 10, lidarCb);
   }
   ros::Subscriber sub_pose = n.subscribe("/mavros/local_position/pose", 10, poseCb);
   ros::Subscriber sub_goal = n.subscribe("/goal_pose", 10, goalCb);

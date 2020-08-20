@@ -36,7 +36,7 @@ beta_max = k_buff * (r_view - rc_min)        # максимально возмо
 dist_offset = 1.0                       # дистанция на которую ставится виртуальная точка от дрона
 
 # топики лазерскан и поинтклауд
-lidar_topic = "/scan"
+lidar_topic = "/laser/scan"
 octomap_topic = "/scan_matched_points2"
 
 goal_sub_topic = "/goal_pose"

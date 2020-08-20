@@ -13,7 +13,7 @@ import time
 
 import numpy as np
 from std_msgs.msg import Float32
-from sensor_msgs.msg import LaserScan, Imu
+from sensor_msgs.msg import LaserScan, Imu, Range
 from geometry_msgs.msg import Quaternion
 
 show_plot_flag = False              # get plot
@@ -21,21 +21,24 @@ show_plot_flag = False              # get plot
 if show_plot_flag:
     import matplotlib.pyplot as plt
 
+
 # topics
 alt_topic = "/drone/alt"
 topic_imu = "/mavros/imu/data"
+topic_range = "/range"
+# port = "/dev/ttyUSB0"
 
-port = "/dev/ttyUSB0"
 
 # setup params
 _rate = 80.0        # rate 80 Hz
 _rate_lidar = 80.
 
+
 srez = 20
 lidar_offset = 0.0
 speed_change = 1.0
 
-use_filter_flag = True
+use_filter_flag = False
 
 # init values
 current_val_lidar = 0.
@@ -46,7 +49,12 @@ init_filter = False
 rotate = Quaternion()
 srez_lidar = list()
 ser = None
+distance = 0.0
 
+def lidar_cb(data):
+    global distance
+    distance = data.range
+    # print distance
 
 def filter(current_data, prev_data, current_speed, max_speed):
     """
@@ -72,21 +80,12 @@ def getLidarData():
     :return:
     """
 
-    global current_val_lidar, rotate, lidar_offset, srez_lidar, ser, use_filter_flag
-    distance = 0.0
+    global current_val_lidar, rotate, lidar_offset, srez_lidar, ser, use_filter_flag, distance
+    # distance = 0.0
     _delay = 1./_rate_lidar
+    # print "dist -> ", distance
     try:
-        while True:
-            count = ser.in_waiting
-            if count > 8:
-                recv = ser.read(9)
-                ser.reset_input_buffer()
-                if recv[0] == 'Y' and recv[1] == 'Y':  # 0x59 is 'Y'
-                    low = int(recv[2].encode('hex'), 16)
-                    high = int(recv[3].encode('hex'), 16)
-                    distance = (low + high * 256) * 0.01
-
-
+            # print distance
             # # пересчитываеем проектцию по углам
             euler = tf.transformations.euler_from_quaternion((rotate.x, rotate.y, rotate.z, rotate.w))
             dist_norm = (np.cos(euler[0]) * distance) * np.cos(euler[1])
@@ -124,10 +123,11 @@ if __name__ == '__main__':
     rate = rospy.Rate(_rate)        # set rate
 
     # init params
-    port = rospy.get_param("~port", port)
+    # port = rospy.get_param("~port", port)
     use_filter_flag = rospy.get_param("~use_filter", use_filter_flag)
     # Subscriber
     rospy.Subscriber(topic_imu, Imu, callbackRot)
+    rospy.Subscriber(topic_range, Range, lidar_cb)
 
     # Publisher
     alt_pub = rospy.Publisher(alt_topic, Float32, queue_size=10)
@@ -150,22 +150,22 @@ if __name__ == '__main__':
         filter_data = 0.
 
     # init serial
-    ser = serial.Serial(port, 115200)
-    if ser.is_open == False:
-        ser.open()
+    # ser = serial.Serial(port, 115200)
+    # if ser.is_open == False:
+    #     ser.open()
 
     # get data in external thread
-    thread = threading.Thread(target=getLidarData)
-    thread.daemon = True
-    thread.start()
+    # thread = threading.Thread(target=getLidarData())
+    # thread.daemon = True
+    # thread.start()
     # loop
     try:
         while not rospy.is_shutdown():
+                getLidarData()
                 # update msgs
-
+                # print distance
                 dt = rospy.get_time()-old_time
                 old_time = rospy.get_time()
-
 
                 if use_filter_flag:
                     current_val_lidar
