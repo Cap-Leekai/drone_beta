@@ -25,7 +25,7 @@ if show_plot_flag:
 # topics
 alt_topic = "/drone/alt"
 topic_imu = "/mavros/imu/data"
-topic_range = "/range"
+topic_range = "/mavros/px4flow/ground_distance"
 # port = "/dev/ttyUSB0"
 
 

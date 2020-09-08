@@ -3,6 +3,6 @@ angular_d: 0.1
 hor_kd: 1.5
 hor_kp: 1.24
 max_hor_vel: 1.2
-max_ver_vel: 2.5
-ver_kd: 0.6499999999999999
-ver_kp: 0.5
+max_ver_vel: 1
+ver_kd: 0
+ver_kp: 2.5
