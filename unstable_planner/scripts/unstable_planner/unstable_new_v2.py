@@ -4,6 +4,7 @@
 import rospy
 import tf
 import copy
+import math
 import numpy as np
 import sensor_msgs.point_cloud2 as pc2
 import laser_geometry.laser_geometry as lg
@@ -31,8 +32,8 @@ r_view = 1.0                            # расстояние срабатыв�
 rc_min = 0.5                            # минимальное расстояне до препятствия
 view_angle = 360                        # угол обзора планировщика
 velocity_gain = 0.1                     # скорость дрона, до которой она считается равной нулю
-k_buff = 2.0					        # коэффициент буффиркационного параметра
-beta_max = k_buff * (r_view - rc_min)   # максимально возможная бета
+k_buff = 2.0					# коэффициент буффиркационного параметра
+beta_max = k_buff * (r_view - rc_min)        # максимально возможная бета
 dist_offset = 1.0                       # дистанция на которую ставится виртуальная точка от дрона
 
 # топики лазерскан и поинтклауд
@@ -185,9 +186,12 @@ def callbackTargetPose(data):
 #            Функция получения минимального расстояния и угла из LaserScan
 ##################################################################################
 def scan_cb(msg):
-    global min_dist, min_dist_index
+    global min_dist, min_dist_index,point_near
     min_dist = min(msg.ranges)
     min_dist_index = msg.ranges.index(min_dist)
+    point_near = [min_dist*math.cos(math.radians(min_dist_index-180)),min_dist*math.sin(math.radians(min_dist_index-180))]
+    print("point_near",point_near)
+
 
 
 ##################################################################################
@@ -391,68 +395,55 @@ def main():
         # print np.rad2deg(ang_ct)
 
         # проверяем что препятствие в зоне радиуса R
+        xPlan = target_pose.pose.point.x
+        yPlan = target_pose.pose.point.y
+
         if min_dist < r_view:
-            # возвращает angle_deg угол на который надо повернуть вектор скорости
-            angle_rad = get_angle(min_dist)
+            Ox=float(point_near[0]) #float(self.obst_near[0]-self.pose[0]) #4.35  #local obstacle x  #self.point_near[0]-self.pose[0]
+            Oy=float(point_near[1]) #float(self.obst_near[1]-self.pose[1]) #1.96  #local obstacle y  #self.point_near[1]-self.pose[1]
 
-            # направление от дрона на ЦТ в ГК
-            # ang_ct = np.arctan2(vec_to_goal[1], vec_to_goal[0])
+            unstableAngle=math.radians(90)
+            min_dist_lidar= 0.5
+            plan_dist= 1.0
 
-            # ang_drone_obs - угол между дроном и препятствием в ГК
-            ang_drone_obs = min_dist_index + np.rad2deg(current_course)-180
-            # нормализуем угол
-            ang_drone_obs = norm_angle_deg(ang_drone_obs)
+           
+            Rx=math.cos(current_course) #1.0
+            Ry=math.sin(current_course) #.0
 
-            # ang_vel - угол ВС в ГК
-            if np.sqrt(vel_vec_2d[0]**2 + vel_vec_2d[1]**2) < velocity_gain:
-                # если ВС равен нулю -  считаем его равным направлению на ЦТ
-                ang_vel_rad = ang_ct
-            else:
-                # иначе - вычисляем направления ВС в ГК
-                ang_vel_rad = np.arctan2(vel_vec_2d[1], vel_vec_2d[0])
 
-            # ang_vel_obs -  угол между ВС и препятствием в ГК
-            ang_vel_obs = ang_drone_obs - np.rad2deg(ang_vel_rad)
-            # нормализуем угол
-            ang_vel_obs = norm_angle_deg(ang_vel_obs)
+            a = np.array([[Ox], [Oy]])
+            b = np.array([[current_pose[0]], [current_pose[1]]])
 
-            # если препятствие находится в области (+-половина от угла обзора) градусов от ВС
-            if abs(ang_vel_obs) < view_angle/2:
-                # копируем накой-то ЦТ
-                target_copy = copy.deepcopy(target_pose)
+            angleRO=math.acos((Ox*Rx+Oy*Ry)/(math.sqrt(Ox**2+Oy**2)*math.sqrt(Rx**2+Ry**2)))
+            if angleRO<=unstableAngle:
 
-                # поворачиваем ЦТ относительно текущей позиции дрона
-                # препятствие слева
-                if ang_vel_obs >= 0:
-                    # вычисляем угол поворота целевой точки
-                    rot_ang = norm_angle_rad(-angle_rad + ang_vel_rad - ang_ct)
-                    virtual_target_pose = rotate_vect(current_pose, target_copy, rot_ang,dist_offset=dist_offset)
-
-                # препятствие справа
-                elif ang_vel_obs < 0:
-                    # вычисляем угол поворота целевой точки
-                    rot_ang = norm_angle_rad(angle_rad + ang_vel_rad - ang_ct)
-                    virtual_target_pose = rotate_vect(current_pose, target_copy, rot_ang, dist_offset=dist_offset)
-
-                # публикуем повернутую точку
-                pub_goal.publish(virtual_target_pose)
-                pub_marker.publish(setup_marker(virtual_target_pose, False))
-                status_pub.publish(True)
-            # иначе, если препятствие сзади
-            else:
-                # не вертим ВЦТ
-                pub_goal.publish(target_pose)
-                pub_marker.publish(setup_marker(target_pose, True))
-                status_pub.publish(False)
-
-        # иначе, если препятствие не в радиусе R
+                kvec=Rx*Oy-Ry*Ox
+                dv = -math.pi/2.0*math.tanh(0.13*min_dist_lidar)+math.pi/2.0
+                print("dv", dv)
+                eps=0.0001
+                if (kvec)<-eps:
+                    M=np.array([[math.cos(dv),-math.sin(dv)],[math.sin(dv),math.cos(dv)]])
+                    Mg=np.array([[math.cos(current_course),-math.sin(current_course)],[math.sin(current_course),math.cos(current_course)]])
+                    coordsPlan=b+np.dot(Mg,(((np.dot(M, a))/np.max(np.abs(np.dot(M,a))))*plan_dist))
+                    print("1")
+                    print("M*A",np.dot(M, a))
+                else:
+                    M=np.array([[math.cos(-dv),-math.sin(-dv)],[math.sin(-dv),math.cos(-dv)]])
+                    Mg=np.array([[math.cos(current_course),-math.sin(current_course)],[math.sin(current_course),math.cos(current_course)]])
+                    coordsPlan = b+np.dot(Mg,(((np.dot(M, a))/np.max(np.abs(np.dot(M,a))))*plan_dist))
+                    print("2")
+                    print("M*A",np.dot(M, a))
+                print("angleRo",angleRO)
+                xPlan=float(coordsPlan[0])
+                yPlan=float(coordsPlan[1])
         else:
-            # не вертим ВЦТ
-            pub_goal.publish(target_pose)
-            pub_marker.publish(setup_marker(target_pose, True))
-            status_pub.publish(False)
+            xPlan = target_pose.pose.point.x
+            yPlan = target_pose.pose.point.y
 
-        rate.sleep()
+        planned_goal = copy.deepcopy(target_pose)
+        planned_goal.pose.point.x = xPlan
+        planned_goal.pose.point.y = yPlan
+        pub_goal.publish(planned_goal)
 
 
 if __name__ == '__main__':
