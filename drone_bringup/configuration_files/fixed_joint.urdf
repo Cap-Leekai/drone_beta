@@ -3,7 +3,6 @@
   
   <link name="base_link" />
   <link name="laser" />
-  <link name="camera_link" />
 
   <joint name="laser_link" type="fixed">
     <parent link="base_link"/>
