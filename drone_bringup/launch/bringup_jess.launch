@@ -1,0 +1,19 @@
+<launch>
+	<!--run node of realsense t265-->  
+	<include file="$(find realsense2_camera)/launch/rs_t265.launch">
+	</include>
+
+	<!-- run PX4 mavros run -->
+	<include file="$(find mavros_link)/launch/px4_slam.launch">                
+		<arg name="tgt_system" default="$(env DRONE_ID)"/>
+		<arg name="tgt_component" default="$(env DRONE_ID)" />
+		<arg name="gcs_ip" default="$(env MAVROS_GCS_IP)"/>
+		<arg name="fcu_url" default="$(env MAVROS_FCU_URL)" />
+		<arg name="fcu_port" default="$(env MAVROS_FCU_PORT)" />
+	</include>
+
+	<!-- run rplidar -->                                                                          │
+        <include file="$(find drone_bringup)/launch/rplidar.launch"/>  
+
+</launch>
+

@@ -26,7 +26,7 @@
 
 bool use_planner_flag = false;
 bool use_geo_mode = false;
-bool use_alt_sonar = true;
+bool use_alt_sonar = false;
 bool calc_vel_from_pos = true;
 
 /*----Глобальные переменные----*/

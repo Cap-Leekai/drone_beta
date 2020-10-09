@@ -11,12 +11,12 @@
 	<node pkg="robot_state_publisher" name="drone_fixed_joints_pub" type="robot_state_publisher" output="screen">
 		<param name="publish_frequency" value="50.0"/>
 	</node>
-
+	
 	<!--read distance data from ground lidar-->
-	<node pkg="drone_bringup" name="altitude_filter_node" type="ground_lidar_seek_ros.py" respawn="true" output="screen">
-	  <param name="port" value="/dev/lidar"/>
-	</node>
-
+	<!--<node pkg="drone_bringup" name="altitude_filter_node" type="ground_lidar_seek_ros.py" respawn="true" output="screen">
+	  	<param name="port" value="/dev/lidar"/>
+	</node>	
+	-->
 	<!--Added tf relative height from ground lidar-->
 	<node pkg="drone_bringup" name="msg_to_tf_node" type="msg_to_tf2.py" respawn="true" output="screen" />
 
@@ -31,7 +31,7 @@
 	</include>
 
 	<!-- run Safemode server -->
-	<node pkg="drone_bringup" name="drone_safery" type="drone_safe_node.py" 	respawn="true" output="screen">
+	<node pkg="drone_bringup" name="drone_safery" type="drone_safe_node.py" respawn="true" output="screen">
 		<param name="max_angle" value="$(env DRONE_SAFE_MAX_ANGLE)"/>
 		<param name="disarm_delay" value="$(env DRONE_SAFE_DISARM_DELAY)"/>
 	</node>

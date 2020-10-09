@@ -1,7 +1,7 @@
 #!/bin/bash
 export DRONE_ID=1
 export DRONE_MARKER_ID=1
-export DRONE_IP=192.168.128.201
+export DRONE_IP=192.168.128.129
 
 export TEAM=0
 
@@ -14,7 +14,7 @@ export ROSBRIDGE_SERVER_IP=''
 export ROSBRIDGE_SERVER_PORT=9090
 
 export MAVROS_GCS_IP=
-export MAVROS_FCU_URL='/dev/ttySAC0:921600'
+export MAVROS_FCU_URL='/dev/ttyTHS1:115200'
 export MAVROS_FCU_PORT=14101
 
 export USE_MESH=False

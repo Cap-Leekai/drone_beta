@@ -9,7 +9,7 @@ startup_px4_usb_quirk: true
 conn:
   heartbeat_rate: 25.0    # send hertbeat rate in Hertz
   timeout: 10.0          # hertbeat timeout in seconds
-  timesync_rate: 10.0    # TIMESYNC rate in Hertz (feature disabled if 0.0)
+  timesync_rate: 0.0    # TIMESYNC rate in Hertz (feature disabled if 0.0)
   system_time_rate: 10.0  # send system time to FCU rate in Hertz (disabled if 0.0)
 
 # sys_status
@@ -203,8 +203,8 @@ px4flow:
 vision_pose:
   tf:
     listen: true           # enable tf listener (disable topic subscribers)
-    frame_id: "map"
-    child_frame_id: "base_link"
+    frame_id: "camera_odom_frame"
+    child_frame_id: "camera_link"
     rate_limit: 30.0
 
 # vision_speed_estimate
