@@ -390,15 +390,17 @@ int main(int argc, char** argv) {
 
     if (use_geo_mode == true)
         goalSub = n.subscribe(goal_global_topic, queue_size, goal_cb);
-    else {
-        if (use_planner_flag == true)
+    
+    else 
+    {
+        if (use_planner_flag == true)   //выбор топика целевой точки
             goalSub = n.subscribe(goal_planner_topic, queue_size, goal_cb);
         else
             goalSub = n.subscribe(goal_local_topic, queue_size, goal_cb);
     }
 
-    if (use_geo_mode == true)
-        navPosSub = n.subscribe(geo_pose_topic, queue_size, nav_pos_cb);
+    if (use_geo_mode == true)   //выбор топика собственных координат дрона
+        navPosSub = n.subscribe(geo_pose_topic, queue_size, nav_pos_cb);    
     else
         navPosSub = n.subscribe(local_pose_topic, queue_size, nav_pos_cb);
 

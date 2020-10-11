@@ -4,12 +4,11 @@
   <node pkg="interactive_goal" name="marker_server" type="marker_server" respawn="true"/>
 
 <!-- set reg-->
-
 <node pkg="drone_reg" name="drone_reg_node" type="drone_reg_cpp" respawn="true" output="screen">
     <param name="use_planner" value="$(env DRONE_REG_USE_PLANNER)"/>
     <param name="use_geo_mode" value="$(env DRONE_REG_USE_GEO_MODE)"/>
     <param name="yaml_path" value="$(find drone_reg)/cfg/pid_params_laba.yaml"/>
-    <param name="use_alt_sonar" value="true"/>
+    <param name="use_alt_sonar" value="false"/>
     </node>
 
 <!-- pot planner-->
