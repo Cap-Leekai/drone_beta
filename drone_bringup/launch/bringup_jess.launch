@@ -11,6 +11,10 @@
 	<include file="$(find realsense2_camera)/launch/rs_t265.launch">
 	</include>
 
+	<!--run node of realsense D435i-->
+    <include file="$(find realsense2_camera)/launch/rs_aligned_depth.launch">
+    </include>
+	
 	<!-- run PX4 mavros run -->
 	<include file="$(find mavros_link)/launch/px4_slam.launch">                
 		<arg name="tgt_system" default="$(env DRONE_ID)"/>
