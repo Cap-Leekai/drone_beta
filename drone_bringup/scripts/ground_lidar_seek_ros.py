@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # coding=utf8
 
-"""
-Node for get altitude from seek lidar.
-"""
 
 import serial
 import rospy
@@ -12,6 +9,9 @@ import threading
 import time
 
 import numpy as np
+"""
+Node for get altitude from seek lidar.
+"""
 from std_msgs.msg import Float32
 from sensor_msgs.msg import LaserScan, Imu
 from geometry_msgs.msg import Quaternion
