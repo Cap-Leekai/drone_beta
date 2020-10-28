@@ -22,6 +22,11 @@
 
 	<!-- run rplidar -->                                                                          │
         <include file="$(find drone_bringup)/launch/rplidar.launch"/>  
+	
+	<!-- run tf_broadcaster base_link on map -->
+	<node pkg="robot_setup_tf" name="tf_broadcaster" type="tf_broadcaster"/>
+                
 
+	
 </launch>
 
