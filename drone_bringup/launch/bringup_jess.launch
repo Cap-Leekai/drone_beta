@@ -1,16 +1,24 @@
 <launch>
-
-    <param name="robot_description" textfile="$(find drone_bringup)/configuration_files/fixed_joint.urdf" />
+	<arg name="camera1"	default="t265"/>
+	<arg name="camera2"     default="d435i"/>
+	<param name="robot_description" textfile="$(find drone_bringup)/configuration_files/fixed_joint.urdf" />
 	
 	<!-- fixed_joint-->
 	<node pkg="robot_state_publisher" name="drone_fixed_joints_pub" type="robot_state_publisher" output="screen">
-		<param name="publish_frequency" value="50.0"/>
+	<param name="publish_frequency" value="50.0"/>
 	</node>
-	
+
+		
 	<!--run node of realsense t265-->  
+<!--
 	<include file="$(find realsense2_camera)/launch/rs_t265.launch">
 	</include>
+-->
+	<!--run node of realsense D435i-->
 
+  	<include file="$(find realsense2_camera)/launch/rs_d400_and_t265.launch">
+   	</include>
+	
 	<!-- run PX4 mavros run -->
 	<include file="$(find mavros_link)/launch/px4_slam.launch">                
 		<arg name="tgt_system" default="$(env DRONE_ID)"/>
@@ -20,7 +28,7 @@
 		<arg name="fcu_port" default="$(env MAVROS_FCU_PORT)" />
 	</include>
 
-	<!-- run rplidar -->                                                                          │
+	<!-- run rplidar -->                 
         <include file="$(find drone_bringup)/launch/rplidar.launch"/>  
 	
 	<!-- run tf_broadcaster base_link on map -->
