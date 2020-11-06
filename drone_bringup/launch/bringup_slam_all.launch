@@ -13,13 +13,12 @@
 	</node>
 
 	<!--read distance data from ground lidar-->
-	<node pkg="drone_bringup" name="altitude_filter_node" type="ground_lidar_seek_ros.py" respawn="true" output="screen">
+	<!--node pkg="drone_bringup" name="altitude_filter_node" type="ground_lidar_seek_ros.py" respawn="true" output="screen">
 	  <param name="port" value="/dev/lidar"/>
-	</node>
+	</node-->
 
 	<!--Added tf relative height from ground lidar-->
 	<node pkg="drone_bringup" name="msg_to_tf_node" type="msg_to_tf2.py" respawn="true" output="screen" />
-
 
 	<!-- run PX4 mavros run -->
 <!--	<include file="$(find mavros_link)/launch/px4_slam.launch">-->
@@ -31,17 +30,17 @@
 <!--	</include>-->
 
 	<!-- run Safemode server -->
-	<node pkg="drone_bringup" name="drone_safery" type="drone_safe_node.py" 	respawn="true" output="screen">
+	<!--node pkg="drone_bringup" name="drone_safery" type="drone_safe_node.py" 	respawn="true" output="screen">
 		<param name="max_angle" value="$(env DRONE_SAFE_MAX_ANGLE)"/>
 		<param name="disarm_delay" value="$(env DRONE_SAFE_DISARM_DELAY)"/>
-	</node>
+	</node-->
 
 	<!-- run PX4 rplidar -->
 	<!--<include file="$(find drone_bringup)/launch/rplidar.launch"/>-->
 
 	<!-- remote control-->
 
-	<node pkg="drone_remote_control" name="remote_control_node" type="remote_control.py" respawn="true"/>
+	<!--node pkg="drone_remote_control" name="remote_control_node" type="remote_control.py" respawn="true"/-->
 
 	<!-- run Rosbridge server -->
 <!--
@@ -58,7 +57,7 @@
     <param name="use_planner" value="$(env DRONE_REG_USE_PLANNER)"/>
     <param name="use_geo_mode" value="$(env DRONE_REG_USE_GEO_MODE)"/>
     <param name="yaml_path" value="$(find drone_reg)/cfg/pid_params_laba.yaml"/>
-    <param name="use_alt_sonar" value="true"/>
+    <param name="use_alt_sonar" value="false"/>
     </node>
 
 <!-- pot planner-->
